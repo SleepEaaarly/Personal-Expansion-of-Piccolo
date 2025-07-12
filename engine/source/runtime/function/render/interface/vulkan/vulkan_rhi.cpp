@@ -2636,6 +2636,7 @@ namespace Piccolo
         pool_sizes[3].descriptorCount = 3 + 5 * m_max_material_count + 1 + 1; // ImGui_ImplVulkan_CreateDeviceObjects
         pool_sizes[4].type            = VK_DESCRIPTOR_TYPE_INPUT_ATTACHMENT;
         pool_sizes[4].descriptorCount = 4 + 1 + 1 + 2;
+        pool_sizes[4].descriptorCount += 1;  // practice pass add 1 attachments
         pool_sizes[5].type            = VK_DESCRIPTOR_TYPE_UNIFORM_BUFFER_DYNAMIC;
         pool_sizes[5].descriptorCount = 3;
         pool_sizes[6].type            = VK_DESCRIPTOR_TYPE_STORAGE_IMAGE;
@@ -2647,6 +2648,7 @@ namespace Piccolo
         pool_info.pPoolSizes    = pool_sizes;
         pool_info.maxSets =
             1 + 1 + 1 + m_max_material_count + m_max_vertex_blending_mesh_count + 1 + 1; // +skybox + axis descriptor set
+        pool_info.maxSets += 1;             // practice pass additional one set
         pool_info.flags = 0U;
 
         if (vkCreateDescriptorPool(m_device, &pool_info, nullptr, &m_vk_descriptor_pool) != VK_SUCCESS)
