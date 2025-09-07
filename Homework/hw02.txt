@@ -6,3 +6,19 @@
 √ 4. 在main_camera_pass.cpp 修改函数，主要是改setupRenderpass，注意要修改practice_pass后续所有对应的输出attachment(上一条的even和odd问题);
 还有就是要考虑添加preserveAttachments
 √ 5. 写practice.frag shader
+
+按照vulkan的实现逻辑展开：
+1. 对desrciptorPool扩容，INPUT_ATTACHMENT descriptor多申请一个，然后set的数量多申请一个。
+2. 根据要实现的功能创建setlayout，具体layout是set包含一个binding然后binding里有一个descriptor是input_attachment
+3. 根据layout向pool申请一个set，并且用attachment(imageview)write set
+4. 设置subpass的pipeline
+5. 整个renderpass需要设置资源并协调同步，因为是后处理效果，不需要添加新的attachment，同一个renderpass也不需要添加新的framebuffer
+因此只需要把现有的attachment绑定到对应subpass的input、color、depth、preserve设置一下。
+同步问题：需要把前一个subpass(color_grading)的COLOR_ATTACHMENT_OUTPUT的COLOR_ATTACHMENT_WRITE设为src，后一个render
+COLOR_ATTACHMENT_OUTPUT的COLOR_ATTACHMENT_READ设为dst
+
+（补）vulkan中的同步有哪些：
+fence：协调CPU与GPU的同步
+semaphore：协调GPU不同队列间的同步
+memory barrier：添加在command buffer中，将该指令之前（指录制的顺序）的所有subpass dst完成后，该指令之后的subpass src才开始。
+subpass dependency：精确到某两个subpass之间的同步，其他功能和memory barrier相同
